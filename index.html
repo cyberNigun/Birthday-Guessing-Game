@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Secret for Desola 🕯️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Pinyon+Script&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-pink: #fce4ec;
+            --chocolate: #3e2723;
+            --parchment: #f1dca7;
+        }
+
+        body {
+            background-color: var(--bg-pink);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: var(--chocolate);
+            text-align: center;
+        }
+
+        /* Intro Envelope Style */
+        #intro-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-pink);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: opacity 0.8s ease;
+        }
+
+        .envelope {
+            width: 200px;
+            height: 150px;
+            background: #d4b475;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+        }
+
+        .envelope::after {
+            content: '✉️';
+            font-size: 3rem;
+        }
+
+        .wax-seal {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: #b71c1c;
+            border-radius: 50%;
+            bottom: -25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: gold;
+            font-weight: bold;
+        }
+
+        /* Parchment & Game */
+        .parchment {
+            background: var(--parchment);
+            background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+            padding: 50px 30px;
+            max-width: 500px;
+            min-height: 300px;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.2);
+            clip-path: polygon(1% 2%, 98% 0%, 100% 15%, 97% 85%, 100% 100%, 85% 97%, 15% 100%, 0% 80%, 3% 15%);
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .parchment.open {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .message-text {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 2.3rem;
+            line-height: 1.2;
+        }
+
+        .choices {
+            margin-top: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .choice-btn {
+            background: var(--chocolate);
+            color: var(--parchment);
+            border: none;
+            padding: 12px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.3rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .choice-btn:hover { background: #5d4037; }
+
+        .hidden { display: none !important; }
+
+        h1 { font-family: 'Dancing Script'; font-size: 2.5rem; }
+    </style>
+</head>
+<body>
+
+    <div id="intro-overlay">
+        <h1 style="margin-bottom: 30px;">You've got mail, Birthday Girl 🎂</h1>
+        <div class="envelope" onclick="openLetter()">
+            <div class="wax-seal">D</div>
+        </div>
+        <p style="margin-top: 40px; font-family: 'Dancing Script'; font-size: 1.4rem;">Tap to unfold the mystery...</p>
+    </div>
+
+    <div id="game-content" class="hidden">
+        <h1 id="title">Who wrote this? ✨</h1>
+        <p id="counter">Secret 1 of 5</p>
+
+        <div class="parchment" id="paper">
+            <div id="messageDisplay" class="message-text"></div>
+        </div>
+
+        <div class="choices" id="choices-grid"></div>
+    </div>
+
+    <script>
+        const wishes = [
+            { text: "Remember the times we used to go to the petrol station at Ijaiye just to be together for longer? You're my angel.", author: "Blessing" },
+            { text: "To the best sister! I still owe you a Netflix marathon and all the snacks.", author: "Shata" },
+            { text: "Happy Birthday! I still owe you that trip to Santorini, no be mouth!", author: "Tunde" },
+            { text: "Keep killing the content game. The world isn't ready for you yet!", author: "David" },
+            { text: "Stay pretty, stay blessed, and stay exactly who you are. Love ya!", author: "Joy" }
+        ];
+
+        // This pulls all unique names and shuffles them
+        const allFriends = [...new Set(wishes.map(w => w.author))];
+        let currentIdx = 0;
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function openLetter() {
+            document.getElementById('intro-overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('intro-overlay').classList.add('hidden');
+                document.getElementById('game-content').classList.remove('hidden');
+                setTimeout(() => document.getElementById('paper').classList.add('open'), 100);
+                loadRound();
+            }, 800);
+        }
+
+        function loadRound() {
+            const currentWish = wishes[currentIdx];
+            document.getElementById('messageDisplay').innerText = `"${currentWish.text}"`;
+            document.getElementById('counter').innerText = `Secret ${currentIdx + 1} of 5`;
+            
+            const grid = document.getElementById('choices-grid');
+            grid.innerHTML = '';
+            
+            // Randomize buttons so she can't guess by order
+            const shuffledNames = shuffle([...allFriends]);
+            
+            shuffledNames.forEach(name => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerText = name;
+                btn.onclick = () => checkGuess(name);
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkGuess(name) {
+            if (name === wishes[currentIdx].author) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#3e2723', '#f8bbd0'] });
+                currentIdx++;
+                if (currentIdx < wishes.length) {
+                    setTimeout(loadRound, 1000);
+                } else {
+                    showFinalCelebration();
+                }
+            } else {
+                // Shake effect
+                const p = document.getElementById('paper');
+                p.style.transform = 'translateX(10px)';
+                setTimeout(() => p.style.transform = 'translateX(-10px)', 100);
+                setTimeout(() => p.style.transform = 'translateX(0)', 200);
+            }
+        }
+
+        function showFinalCelebration() {
+            document.getElementById('paper').innerHTML = `<div class="message-text">You guessed them all!<br>Happy Birthday Desola! ❤️</div>`;
+            document.getElementById('choices-grid').classList.add('hidden');
+            document.getElementById('counter').innerText = "Mission Accomplished";
+            
+            const end = Date.now() + 5000;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+    </script>
+</body>
+</html>
