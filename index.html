@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Secret for Desola 🕯️</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Pinyon+Script&display=swap" rel="stylesheet">
+    <title>A Letter for Desola 🕯️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Pinyon+Script&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
@@ -24,10 +24,9 @@
             margin: 0;
             padding: 20px;
             color: var(--chocolate);
-            text-align: center;
         }
 
-        /* Intro Envelope Style */
+        /* Initial Envelope Screen */
         #intro-overlay {
             position: fixed;
             inset: 0;
@@ -37,77 +36,91 @@
             align-items: center;
             justify-content: center;
             z-index: 100;
-            transition: opacity 0.8s ease;
+            transition: all 1s ease;
         }
 
         .envelope {
-            width: 200px;
-            height: 150px;
+            width: 180px;
+            height: 120px;
             background: #d4b475;
             position: relative;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 5px;
+            transition: transform 0.3s;
         }
 
-        .envelope::after {
-            content: '✉️';
-            font-size: 3rem;
-        }
+        .envelope:hover { transform: scale(1.05); }
 
         .wax-seal {
             position: absolute;
             width: 50px;
             height: 50px;
-            background: #b71c1c;
+            background: #8e0000;
             border-radius: 50%;
-            bottom: -25px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: gold;
-            font-weight: bold;
+            color: #ffd700;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
 
-        /* Parchment & Game */
+        /* Parchment Styling */
+        .parchment-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 600px;
+            display: none;
+        }
+
         .parchment {
             background: var(--parchment);
             background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
-            padding: 50px 30px;
-            max-width: 500px;
-            min-height: 300px;
-            box-shadow: 10px 10px 30px rgba(0,0,0,0.2);
-            clip-path: polygon(1% 2%, 98% 0%, 100% 15%, 97% 85%, 100% 100%, 85% 97%, 15% 100%, 0% 80%, 3% 15%);
-            transform: scale(0.8);
-            opacity: 0;
-            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 40px;
+            min-height: 400px;
+            box-shadow: 10px 10px 40px rgba(0,0,0,0.2);
+            position: relative;
+            transform-origin: top;
+            transform: rotateX(-90deg);
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            clip-path: polygon(1% 1%, 98% 0%, 100% 15%, 98% 85%, 100% 100%, 85% 98%, 15% 100%, 0% 85%, 2% 15%);
         }
 
-        .parchment.open {
-            transform: scale(1);
-            opacity: 1;
+        .parchment.unfolded { transform: rotateX(0deg); }
+
+        .message-content {
+            font-family: 'EB Garamond', serif;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            text-align: left;
+            white-space: pre-line;
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 10px;
         }
 
-        .message-text {
+        .sender-reveal {
             font-family: 'Pinyon Script', cursive;
-            font-size: 2.3rem;
-            line-height: 1.2;
+            font-size: 2.5rem;
+            margin-top: 20px;
+            text-align: right;
+            opacity: 0;
+            transition: opacity 1s;
         }
 
-        .choices {
-            margin-top: 25px;
+        /* Buttons */
+        .choice-grid {
+            margin-top: 30px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
             width: 100%;
-            max-width: 450px;
+            max-width: 600px;
         }
 
         .choice-btn {
@@ -116,114 +129,138 @@
             border: none;
             padding: 12px;
             font-family: 'Dancing Script', cursive;
-            font-size: 1.3rem;
-            border-radius: 5px;
+            font-size: 1.2rem;
+            border-radius: 4px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s;
         }
 
-        .choice-btn:hover { background: #5d4037; }
+        .choice-btn:hover { background: #5d4037; transform: translateY(-2px); }
+
+        .next-btn {
+            margin-top: 20px;
+            background: #8e0000;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 20px;
+            display: none;
+            cursor: pointer;
+            border: none;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.4rem;
+        }
 
         .hidden { display: none !important; }
-
-        h1 { font-family: 'Dancing Script'; font-size: 2.5rem; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: var(--chocolate); border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <div id="intro-overlay">
-        <h1 style="margin-bottom: 30px;">You've got mail, Birthday Girl 🎂</h1>
+        <h1 style="font-family: 'Dancing Script';">A Private Letter for Ikmat</h1>
         <div class="envelope" onclick="openLetter()">
-            <div class="wax-seal">D</div>
+            <div class="wax-seal">M</div>
         </div>
-        <p style="margin-top: 40px; font-family: 'Dancing Script'; font-size: 1.4rem;">Tap to unfold the mystery...</p>
+        <p style="font-family: 'EB Garamond'; font-style: italic; margin-top: 20px;">Tap to break the seal</p>
     </div>
 
-    <div id="game-content" class="hidden">
-        <h1 id="title">Who wrote this? ✨</h1>
-        <p id="counter">Secret 1 of 5</p>
-
-        <div class="parchment" id="paper">
-            <div id="messageDisplay" class="message-text"></div>
+    <div id="main-game" class="hidden">
+        <h2 id="round-title" style="font-family: 'Dancing Script';">Message 1 of 6</h2>
+        
+        <div class="parchment-container" id="container">
+            <div class="parchment" id="paper">
+                <div id="text-area" class="message-content"></div>
+                <div id="reveal-area" class="sender-reveal"></div>
+            </div>
         </div>
 
-        <div class="choices" id="choices-grid"></div>
+        <p id="instruction" style="font-family: 'Dancing Script'; font-size: 1.3rem; margin-top: 20px;">Who sent this heart-felt note?</p>
+        
+        <div class="choice-grid" id="choices"></div>
+        <button id="next-round" class="next-btn" onclick="nextRound()">Read Next Letter →</button>
     </div>
 
     <script>
         const wishes = [
-            { text: "Remember the times we used to go to the petrol station at Ijaiye just to be together for longer? You're my angel.", author: "Blessing" },
-            { text: "To the best sister! I still owe you a Netflix marathon and all the snacks.", author: "Shata" },
-            { text: "Happy Birthday! I still owe you that trip to Santorini, no be mouth!", author: "Tunde" },
-            { text: "Keep killing the content game. The world isn't ready for you yet!", author: "David" },
-            { text: "Stay pretty, stay blessed, and stay exactly who you are. Love ya!", author: "Joy" }
+            { author: "Blessings", text: `My forever friend, Desola mi owon, my sweet angel on earth...\n\nLove is the silent comfort I feel every time I text you, love is how full your heart is when it comes to me. This year makes it ten years since I met you. I'm proud of you, Ikmat. I'm proud of your hard work, the way you guard your heart jealously.\n\nI can't wait for that Santorini trip to happen. I love you so much baby.` },
+            { author: "Posi", text: `My IKM! My Minerva for a reason 🤭\n\nI remember when you spoke at the Afara Workshop Training… I paused for a minute and whispered to myself, “Yes. That’s my girl, y’all.” 🥹😍\n\nWelcome to your year of Becoming Her 🤭🥰. May this new year bring you joy that feels like sunlight.` },
+            { author: "Oke", text: `Happy Birthday to my forever twin 🤍✨\n\nSix whole years of friendship. We’ve literally grown up together... people call us twins (which I secretly love). You are a warrior. At least i know one in marine science, she's gracefully beautiful. Watching you heal has been inspiring.\n\nI love you endlessly, ERINFOLAMI MI🥰🥂.` },
+            { author: "Angel", text: `Ikimo! Happy birthday my love\n\nFinding your friendship feels like winning the friend lottery! From being the best swim partner to the best siwes partner everrr!\n\nLet's get the funds for that bbl quickly so we can start working towards a girl's trip to Mauritius! Love you loads!❤️` },
+            { author: "Solomon", text: `Happy Birthday, Minerva! ❤️\n\nMinerva 💗 is such a beautiful, unique, and amazing queen. Her smile is truly everything! She is a public speaking enthusiast who radiates confidence.\n\nContinue to excel and be the best version of yourself!` },
+            { author: "Lola", text: `Today, I celebrate not just my roommate, but my sister, my fashionista, my photographer and videographer.\n\nLiving with you has been such a gift. In a world that can be loud and overwhelming, you are peace. You are softness. You are home. Happy Birthday, my person. I love you deeply 💛✨` }
         ];
 
-        // This pulls all unique names and shuffles them
-        const allFriends = [...new Set(wishes.map(w => w.author))];
         let currentIdx = 0;
-
-        function shuffle(array) {
-            return array.sort(() => Math.random() - 0.5);
-        }
+        const allNames = wishes.map(w => w.author);
 
         function openLetter() {
             document.getElementById('intro-overlay').style.opacity = '0';
             setTimeout(() => {
                 document.getElementById('intro-overlay').classList.add('hidden');
-                document.getElementById('game-content').classList.remove('hidden');
-                setTimeout(() => document.getElementById('paper').classList.add('open'), 100);
+                document.getElementById('main-game').classList.remove('hidden');
+                document.getElementById('container').style.display = 'block';
+                setTimeout(() => document.getElementById('paper').classList.add('unfolded'), 100);
                 loadRound();
-            }, 800);
+            }, 1000);
         }
 
         function loadRound() {
-            const currentWish = wishes[currentIdx];
-            document.getElementById('messageDisplay').innerText = `"${currentWish.text}"`;
-            document.getElementById('counter').innerText = `Secret ${currentIdx + 1} of 5`;
+            const data = wishes[currentIdx];
+            document.getElementById('round-title').innerText = `Message ${currentIdx + 1} of 6`;
+            document.getElementById('text-area').innerText = data.text;
+            document.getElementById('reveal-area').style.opacity = '0';
+            document.getElementById('reveal-area').innerText = `~ ${data.author}`;
+            document.getElementById('instruction').classList.remove('hidden');
+            document.getElementById('next-round').style.display = 'none';
             
-            const grid = document.getElementById('choices-grid');
+            const grid = document.getElementById('choices');
             grid.innerHTML = '';
             
-            // Randomize buttons so she can't guess by order
-            const shuffledNames = shuffle([...allFriends]);
+            // Shuffle names
+            const shuffled = [...allNames].sort(() => Math.random() - 0.5);
             
-            shuffledNames.forEach(name => {
+            shuffled.forEach(name => {
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
                 btn.innerText = name;
-                btn.onclick = () => checkGuess(name);
+                btn.onclick = () => check(name, btn);
                 grid.appendChild(btn);
             });
         }
 
-        function checkGuess(name) {
+        function check(name, btn) {
             if (name === wishes[currentIdx].author) {
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#3e2723', '#f8bbd0'] });
-                currentIdx++;
-                if (currentIdx < wishes.length) {
-                    setTimeout(loadRound, 1000);
-                } else {
-                    showFinalCelebration();
-                }
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.7 }, colors: ['#3e2723', '#f8bbd0'] });
+                document.getElementById('reveal-area').style.opacity = '1';
+                document.getElementById('choices').innerHTML = '';
+                document.getElementById('instruction').classList.add('hidden');
+                document.getElementById('next-round').style.display = 'inline-block';
             } else {
-                // Shake effect
-                const p = document.getElementById('paper');
-                p.style.transform = 'translateX(10px)';
-                setTimeout(() => p.style.transform = 'translateX(-10px)', 100);
-                setTimeout(() => p.style.transform = 'translateX(0)', 200);
+                btn.style.background = '#b71c1c';
+                btn.innerText = "Try again!";
             }
         }
 
-        function showFinalCelebration() {
-            document.getElementById('paper').innerHTML = `<div class="message-text">You guessed them all!<br>Happy Birthday Desola! ❤️</div>`;
-            document.getElementById('choices-grid').classList.add('hidden');
-            document.getElementById('counter').innerText = "Mission Accomplished";
+        function nextRound() {
+            currentIdx++;
+            if (currentIdx < wishes.length) {
+                loadRound();
+            } else {
+                showFinal();
+            }
+        }
+
+        function showFinal() {
+            document.getElementById('round-title').innerText = "Happy Birthday, Ikmat!";
+            document.getElementById('text-area').innerHTML = "<h2 style='text-align:center'>You are truly loved by many. <br><br> May this year be your best one yet!</h2>";
+            document.getElementById('reveal-area').innerText = "";
+            document.getElementById('next-round').style.display = 'none';
             
-            const end = Date.now() + 5000;
+            var end = Date.now() + (7 * 1000);
             (function frame() {
-                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
-                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
+                confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 } });
+                confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 } });
                 if (Date.now() < end) requestAnimationFrame(frame);
             }());
         }
